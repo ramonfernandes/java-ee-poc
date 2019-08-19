@@ -3,7 +3,6 @@ package model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.util.UUID;
 
 @Entity
 public class Book {
@@ -18,6 +17,9 @@ public class Book {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
+    }
+
+    public Book() {
     }
 
     public long getId() {

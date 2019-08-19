@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
@@ -19,8 +20,11 @@ public class BookService {
     private EntityManager entityManager;
 
     @GET
+    @Produces("text/plain")
     public String getAll() {
-        return "funciona";
+        return new ArrayList<Book>(){{
+            add(new Book(123, "Ramon", 2));
+        }}.toString();
     }
 
     @POST
