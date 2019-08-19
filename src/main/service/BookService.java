@@ -12,16 +12,15 @@ import java.util.List;
 @Stateless
 @Path("book")
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
+@Produces(MediaType.TEXT_PLAIN)
 public class BookService {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @GET
-    public List<Book> getAll() {
-        return entityManager.createNamedQuery("SELECT book FROM Book book", Book.class)
-                .getResultList();
+    public String getAll() {
+        return "funciona";
     }
 
     @POST
