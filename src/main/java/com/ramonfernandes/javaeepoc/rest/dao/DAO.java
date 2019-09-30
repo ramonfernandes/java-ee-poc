@@ -2,59 +2,74 @@ package com.ramonfernandes.javaeepoc.rest.dao;
 
 import com.ramonfernandes.javaeepoc.rest.dto.Book;
 
+import javax.persistence.*;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class DAO {
 
-    public List<Book> get() throws SQLException {
-        Connection conn = new ConnectionSetup().getConn();
+    private static EntityManagerFactory factory;
+    private static EntityManager entityManager;
 
-        String queryString = "select * from Book";
-        Statement stmt = conn.createStatement();
-        ResultSet rset = stmt.executeQuery(queryString);
+    public Collection<Book> get() throws SQLException {
+        stabblishConnection();
 
-        List<Book> result = new ArrayList<>();
+        Query query = entityManager.createQuery("SELECT x FROM Book x");
+        Collection<Book> books = (Collection<Book>) query.getResultList();
 
-        while (rset.next()) {
-            result.add(new Book(rset.getInt(1), rset.getString(2)));
-        }
+        closesConnection(entityManager, factory);
 
-        return result;
-
+        return books;
     }
 
     public void delete(int id) throws SQLException {
+        stabblishConnection();
 
-        Connection conn = new ConnectionSetup().getConn();
+        Book book = entityManager.find(Book.class, id);
 
-        String queryString = "delete from Book where id=" + id;
-        Statement stmt = conn.createStatement();
-        stmt.executeUpdate(queryString);
+        entityManager.getTransaction().begin();
+        entityManager.remove(book);
+        entityManager.getTransaction().commit();
+
+        closesConnection(entityManager, factory);
 
     }
 
     public void update(int id, Book book) throws SQLException {
-        Connection conn = new ConnectionSetup().getConn();
 
-        String queryString = "UPDATE Book" +
-                " SET id = "+book.getId()+", name= '"+book.getName()+"' " +
-                "WHERE id = "+id+";";
-        System.out.println(queryString);
-        Statement stmt = conn.createStatement();
-        stmt.executeUpdate(queryString);
+        stabblishConnection();
+
+        Book newBook = entityManager.find(Book.class, id);
+
+        entityManager.getTransaction().begin();
+        newBook.setName(book.getName());
+        entityManager.getTransaction().commit();
+
+        closesConnection(entityManager, factory);
     }
 
     public void create(Book book) throws SQLException {
-        Connection conn = new ConnectionSetup().getConn();
+        stabblishConnection();
 
-        String queryString = "INSERT INTO Book " + "VALUES (" + book.getId() + ", '" + book.getName() + "')";
-        Statement stmt = conn.createStatement();
-        stmt.executeUpdate(queryString);
+        entityManager.getTransaction().begin();
+        entityManager.persist(book);
+        entityManager.getTransaction().commit();
+
+        closesConnection(entityManager, factory);
+    }
+
+    private void stabblishConnection() {
+        factory = Persistence.createEntityManagerFactory("Library");
+        entityManager = factory.createEntityManager();
+    }
+
+
+    private void closesConnection(EntityManager entityManager, EntityManagerFactory factory) {
+        entityManager.close();
+        factory.close();
     }
 
 }
