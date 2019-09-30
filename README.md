@@ -38,6 +38,6 @@ body {
 ```
 
 
-POST: inserts a book in the database
+DELETE: deletes a book in the database
 
 ``localhost:8080/library/{bookId}``
